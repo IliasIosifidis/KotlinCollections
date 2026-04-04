@@ -9,7 +9,7 @@ class NumbersMutableListTest {
 
     companion object{
         @JvmStatic
-        fun mutableListSource() = listOf(NumbersArayList())
+        fun mutableListSource() = listOf(NumbersArayList(), NumbersLinkedList())
     }
 
     @ParameterizedTest
