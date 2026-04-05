@@ -1,8 +1,8 @@
 package collections
 
-class NumbersArayList(initialCapacity: Int = INITIAL_CAPACITY) : NumbersMutableList {
+class NumbersArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> {
 
-    private var numbers = arrayOfNulls<Int>(INITIAL_CAPACITY)
+    private var numbers = arrayOfNulls<Any>(INITIAL_CAPACITY)
 
     private fun checkIndex(index: Int){
         if (index < 0 || index >= size){
@@ -18,7 +18,7 @@ class NumbersArayList(initialCapacity: Int = INITIAL_CAPACITY) : NumbersMutableL
 
     private fun growIfNeeded(){
         if (numbers.size == size){
-            val newArray = arrayOfNulls<Int>((numbers.size.toDouble() * 1.5).toInt())
+            val newArray = arrayOfNulls<Any>((numbers.size.toDouble() * 1.5).toInt())
             System.arraycopy(numbers, 0, newArray, 0, size)
             numbers = newArray
         }
@@ -27,30 +27,30 @@ class NumbersArayList(initialCapacity: Int = INITIAL_CAPACITY) : NumbersMutableL
     override var size: Int = 0
         private set
 
-    override fun plus(number: Int) {
-        add(number)
+    override fun plus(element: T) {
+        add(element)
     }
 
-    override fun minus(number: Int) {
-        remove(number)
+    override fun minus(element: T) {
+        remove(element)
     }
 
-    override fun add(number: Int) {
+    override fun add(element: T) {
         growIfNeeded()
-        numbers[size] = number
+        numbers[size] = element
         size++
     }
 
-    override fun add(index: Int, number: Int) {
+    override fun add(index: Int, element: T) {
         checkIndexForAdding(index)
         System.arraycopy(numbers, index, numbers, index + 1, size - index)
-        numbers[index] = number
+        numbers[index] = element
         size++
     }
 
-    override fun get(index: Int): Int {
+    override fun get(index: Int): T {
         checkIndex(index)
-        return numbers[index]!!
+        return numbers[index] as T
     }
 
     override fun removeAt(index: Int) {
@@ -60,9 +60,9 @@ class NumbersArayList(initialCapacity: Int = INITIAL_CAPACITY) : NumbersMutableL
         numbers[size] = null
     }
 
-    override fun remove(number: Int) {
+    override fun remove(element: T) {
         for (i in 0..size){
-            if (numbers[i] == number){
+            if (numbers[i] == element){
                 removeAt(i)
                 return
             }
@@ -70,13 +70,13 @@ class NumbersArayList(initialCapacity: Int = INITIAL_CAPACITY) : NumbersMutableL
     }
 
     override fun clear() {
-        numbers = arrayOfNulls<Int>(10)
+        numbers = arrayOfNulls<Any>(10)
         size = 0
     }
 
-    override fun contains(number: Int): Boolean {
+    override fun contains(element: T): Boolean {
         for (i in 0..size){
-            if (numbers[i] == number) {
+            if (numbers[i] == element) {
                 return true
             }
         }
