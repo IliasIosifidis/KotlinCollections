@@ -5,11 +5,11 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class NumbersMutableListTest {
+class NumbersMutableListTest<T> {
 
     companion object{
         @JvmStatic
-        fun mutableListSource() = listOf(NumbersArayList(), NumbersLinkedList())
+        fun mutableListSource() = listOf(MyArayList<T>(), MyLinkedList<T>())
     }
 
     @ParameterizedTest

@@ -1,4 +1,4 @@
-package collections
+package calculator
 
 interface Calculator {
     fun sum(a:Int, b: Int): Int

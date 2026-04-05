@@ -4,9 +4,7 @@ interface MyMutableCollection<T> {
 
     val size: Int
 
-    operator fun get(index: Int): T
-
-    fun add(element: T)
+    fun add(element: T): Boolean
 
     fun remove(element: T)
 

@@ -1,6 +1,6 @@
 package collections
 
-class NumbersArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> {
+class MyArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> {
 
     private var numbers = arrayOfNulls<Any>(INITIAL_CAPACITY)
 
@@ -35,10 +35,11 @@ class NumbersArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableLis
         remove(element)
     }
 
-    override fun add(element: T) {
+    override fun add(element: T): Boolean {
         growIfNeeded()
         numbers[size] = element
         size++
+        return true
     }
 
     override fun add(index: Int, element: T) {

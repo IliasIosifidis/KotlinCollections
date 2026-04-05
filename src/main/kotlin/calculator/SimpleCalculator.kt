@@ -1,20 +1,17 @@
-package collections
+package calculator
 
-class LoggingCalculator: Calculator {
+class SimpleCalculator: Calculator {
+
     override fun sum(a:Int, b: Int): Int{
-        println("Operation sum $a, $b}")
         return a + b
     }
     override fun subtraction(a: Int, b: Int): Int{
-        println("Operation sub $a, $b}")
         return a - b
     }
     override fun multiply(a: Int, b: Int): Int{
-        println("Operation mul $a, $b}")
         return a * b
     }
-    override fun division(a: Int, b: Int): Double {
-        println("Operation div $a, $b}")
+    override fun division(a: Int, b: Int): Double{
         return (a.toDouble() / b.toDouble())
     }
 }
