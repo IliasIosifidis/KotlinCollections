@@ -2,7 +2,8 @@ package collections
 
 class MyArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> {
 
-    private var numbers = arrayOfNulls<Any>(INITIAL_CAPACITY)
+    private var elements = arrayOfNulls<Any>(INITIAL_CAPACITY)
+    private var modCount = 0
 
     private fun checkIndex(index: Int){
         if (index < 0 || index >= size){
@@ -17,10 +18,10 @@ class MyArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> 
     }
 
     private fun growIfNeeded(){
-        if (numbers.size == size){
-            val newArray = arrayOfNulls<Any>((numbers.size.toDouble() * 1.5).toInt())
-            System.arraycopy(numbers, 0, newArray, 0, size)
-            numbers = newArray
+        if (elements.size == size){
+            val newArray = arrayOfNulls<Any>((elements.size.toDouble() * 1.5).toInt())
+            System.arraycopy(elements, 0, newArray, 0, size)
+            elements = newArray
         }
     }
 
@@ -36,34 +37,38 @@ class MyArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> 
     }
 
     override fun add(element: T): Boolean {
+        modCount++
         growIfNeeded()
-        numbers[size] = element
+        elements[size] = element
         size++
         return true
     }
 
     override fun add(index: Int, element: T) {
+        modCount++
         checkIndexForAdding(index)
-        System.arraycopy(numbers, index, numbers, index + 1, size - index)
-        numbers[index] = element
+        System.arraycopy(elements, index, elements, index + 1, size - index)
+        elements[index] = element
         size++
     }
 
     override fun get(index: Int): T {
         checkIndex(index)
-        return numbers[index] as T
+        return elements[index] as T
     }
 
     override fun removeAt(index: Int) {
+        modCount++
         checkIndex(index)
-        System.arraycopy(numbers, index + 1, numbers, index, size - index - 1)
+        System.arraycopy(elements, index + 1, elements, index, size - index - 1)
         size--
-        numbers[size] = null
+        elements[size] = null
     }
 
     override fun remove(element: T) {
+        modCount++
         for (i in 0..size){
-            if (numbers[i] == element){
+            if (elements[i] == element){
                 removeAt(i)
                 return
             }
@@ -71,17 +76,39 @@ class MyArayList<T>(initialCapacity: Int = INITIAL_CAPACITY) : MyMutableList<T> 
     }
 
     override fun clear() {
-        numbers = arrayOfNulls<Any>(10)
+        modCount++
+        elements = arrayOfNulls<Any>(10)
         size = 0
     }
 
     override fun contains(element: T): Boolean {
         for (i in 0..size){
-            if (numbers[i] == element) {
+            if (elements[i] == element) {
                 return true
             }
         }
         return false
+    }
+
+    override fun iterator(): MutableIterator<T> {
+        return object : MutableIterator<T>{
+
+            private val currentModCount = modCount
+            private var nextIndex = 0
+
+            override fun next(): T {
+                if (currentModCount != modCount) throw ConcurrentModificationException()
+                return elements[nextIndex++] as T
+            }
+
+            override fun hasNext(): Boolean {
+                return nextIndex < size
+            }
+
+            override fun remove() {
+                TODO("Not yet implemented")
+            }
+        }
     }
 
     companion object{

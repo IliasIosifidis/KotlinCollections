@@ -1,6 +1,6 @@
 package collections
 
-interface MyMutableCollection<T> {
+interface MyMutableCollection<T>: MutableIterable<T> {
 
     val size: Int
 
