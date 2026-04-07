@@ -1,0 +1,4 @@
+package collections
+
+fun main() {
+}
