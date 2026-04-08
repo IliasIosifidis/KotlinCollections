@@ -1,4 +1,0 @@
-package collections
-
-fun main() {
-}
