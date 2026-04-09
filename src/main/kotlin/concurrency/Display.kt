@@ -1,29 +1,14 @@
-package coroutines
+package concurrency
 
 import entities.Author
 import entities.Book
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.awt.event.WindowListener
 import java.util.concurrent.Executors
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JTextArea
-import javax.swing.WindowConstants.EXIT_ON_CLOSE
+import javax.swing.*
 import kotlin.concurrent.thread
 
 object Display {
@@ -37,25 +22,21 @@ object Display {
 
     private val loadButton = JButton("Load Book").apply {
         addActionListener {
+            isEnabled = false
+            infoArea.text = "Loading book information..."
+
+            val jobs = mutableListOf<Deferred<Book>>()
+            repeat(10) {
+                scope.async {
+                    val book = loadBook()
+                    infoArea.append("Book: ${book.title}\n $it Year: ${book.year}\n Genre: ${book.genre}\n\n")
+                    book
+                }.let { jobs.add(it) }
+            }
             scope.launch {
-                isEnabled = false
-                infoArea.text = "Loading book information..."
-                val book = loadBook()
-                println("Loaded: $book")
-                infoArea.append(
-                    """
-                    Book: ${book.title}
-                    Year: ${book.year}
-                    Genre: ${book.genre}
-                    """)
-                val author = loadAuthor(book)
-                println("Loaded: $author")
-                    infoArea.append("Loading author information...")
-                    infoArea.append(
-                        """
-                    Author: ${author.name}
-                    Bio: ${author.bio}""")
-                    isEnabled = true
+                val books = jobs.awaitAll()
+                print(books.joinToString(", "))
+                isEnabled = true
             }
         }
     }
@@ -71,8 +52,8 @@ object Display {
         layout = BorderLayout()
         add(topPanel, BorderLayout.NORTH)
         add(JScrollPane(infoArea), BorderLayout.CENTER)
-        size = Dimension(400, 300)
-        addWindowListener(object : WindowAdapter(){
+        size = Dimension(400, 800)
+        addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 scope.cancel()
             }
@@ -84,39 +65,36 @@ object Display {
         startTimer()
     }
 
-    private fun longOperation(){
+    private fun longOperation() {
         mutableListOf<Int>().apply {
-            repeat(3000){
-             add(0,it)
-            println(it)
-            }
+            repeat(50_000) {
+                add(0, it)
+            }.also { println("done") }
         }
     }
 
     private suspend fun loadBook(): Book {
-        return withContext(Dispatchers.Default){
+        return withContext(Dispatchers.Default) {
             longOperation()
-//            delay(1000)
             (Book("Red Rising", 2014, "Sci-fi"))
         }
     }
 
-    private suspend fun loadAuthor(book: Book,): Author {
-        withContext(Dispatchers.Default){
+    private suspend fun loadAuthor(book: Book): Author {
+        withContext(Dispatchers.Default) {
             longOperation()
         }
-//        delay(1000)
         return (Author("Pierce Brown", "cant measure time correctly"))
     }
 
     private fun startTimer() {
-        thread {
+        scope.launch {
             var totalSeconds = 0
             while (true) {
                 val minutes = totalSeconds / 60
                 val seconds = totalSeconds % 60
                 timeLabel.text = String.format("Time: %02d:%02d", minutes, seconds)
-                Thread.sleep(1000)
+                delay(1000)
                 totalSeconds++
             }
         }
